@@ -1,0 +1,13 @@
+/home/kali/Documents/fuzzing-101-solutions/target/debug/deps/postcard-3fdaca5a23995aab.rmeta: /home/kali/.cargo/registry/src/github.com-1ecc6299db9ec823/postcard-0.7.2/src/lib.rs /home/kali/.cargo/registry/src/github.com-1ecc6299db9ec823/postcard-0.7.2/src/accumulator.rs /home/kali/.cargo/registry/src/github.com-1ecc6299db9ec823/postcard-0.7.2/src/de/mod.rs /home/kali/.cargo/registry/src/github.com-1ecc6299db9ec823/postcard-0.7.2/src/de/deserializer.rs /home/kali/.cargo/registry/src/github.com-1ecc6299db9ec823/postcard-0.7.2/src/error.rs /home/kali/.cargo/registry/src/github.com-1ecc6299db9ec823/postcard-0.7.2/src/ser/mod.rs /home/kali/.cargo/registry/src/github.com-1ecc6299db9ec823/postcard-0.7.2/src/ser/flavors.rs /home/kali/.cargo/registry/src/github.com-1ecc6299db9ec823/postcard-0.7.2/src/ser/serializer.rs /home/kali/.cargo/registry/src/github.com-1ecc6299db9ec823/postcard-0.7.2/src/varint.rs
+
+/home/kali/Documents/fuzzing-101-solutions/target/debug/deps/postcard-3fdaca5a23995aab.d: /home/kali/.cargo/registry/src/github.com-1ecc6299db9ec823/postcard-0.7.2/src/lib.rs /home/kali/.cargo/registry/src/github.com-1ecc6299db9ec823/postcard-0.7.2/src/accumulator.rs /home/kali/.cargo/registry/src/github.com-1ecc6299db9ec823/postcard-0.7.2/src/de/mod.rs /home/kali/.cargo/registry/src/github.com-1ecc6299db9ec823/postcard-0.7.2/src/de/deserializer.rs /home/kali/.cargo/registry/src/github.com-1ecc6299db9ec823/postcard-0.7.2/src/error.rs /home/kali/.cargo/registry/src/github.com-1ecc6299db9ec823/postcard-0.7.2/src/ser/mod.rs /home/kali/.cargo/registry/src/github.com-1ecc6299db9ec823/postcard-0.7.2/src/ser/flavors.rs /home/kali/.cargo/registry/src/github.com-1ecc6299db9ec823/postcard-0.7.2/src/ser/serializer.rs /home/kali/.cargo/registry/src/github.com-1ecc6299db9ec823/postcard-0.7.2/src/varint.rs
+
+/home/kali/.cargo/registry/src/github.com-1ecc6299db9ec823/postcard-0.7.2/src/lib.rs:
+/home/kali/.cargo/registry/src/github.com-1ecc6299db9ec823/postcard-0.7.2/src/accumulator.rs:
+/home/kali/.cargo/registry/src/github.com-1ecc6299db9ec823/postcard-0.7.2/src/de/mod.rs:
+/home/kali/.cargo/registry/src/github.com-1ecc6299db9ec823/postcard-0.7.2/src/de/deserializer.rs:
+/home/kali/.cargo/registry/src/github.com-1ecc6299db9ec823/postcard-0.7.2/src/error.rs:
+/home/kali/.cargo/registry/src/github.com-1ecc6299db9ec823/postcard-0.7.2/src/ser/mod.rs:
+/home/kali/.cargo/registry/src/github.com-1ecc6299db9ec823/postcard-0.7.2/src/ser/flavors.rs:
+/home/kali/.cargo/registry/src/github.com-1ecc6299db9ec823/postcard-0.7.2/src/ser/serializer.rs:
+/home/kali/.cargo/registry/src/github.com-1ecc6299db9ec823/postcard-0.7.2/src/varint.rs:
