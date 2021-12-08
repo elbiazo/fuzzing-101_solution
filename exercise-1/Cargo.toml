@@ -2,8 +2,9 @@
 name = "exercise-1"
 version = "0.1.0"
 edition = "2021"
+build = "build.rs"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-libafl = {path = "/home/kali/tools/LibAFL/libafl"}
+libafl = "0.6.1"
