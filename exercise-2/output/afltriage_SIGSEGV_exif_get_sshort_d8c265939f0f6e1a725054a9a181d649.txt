@@ -1,0 +1,109 @@
+Summary: CRASH detected in exif_get_sshort due to a fault at or near 0x0000000000000003 leading to SIGSEGV (si_signo=11) / SEGV_MAPERR (si_code=1)
+Command line: ./build/triager @@
+Testcase: solutions/6bffd4cf55c3c2b3
+Crash bucket: d8c265939f0f6e1a725054a9a181d649
+
+Crashing thread backtrace:
+#0  0x00000000004eaaa7 in exif_get_sshort (/home/ebiazo/Documents/fuzzing-101_solution/exercise-2/build/triager)
+                       ??: ExifSShort exif_get_sshort(buf = (const unsigned char *)0x2 <error: Cannot access memory at address 0x2>, order = (ExifByteOrder)<optimized out>) {
+                       ||:
+                       ||: /* Local reference: const unsigned char * buf = 0x2 <error: Cannot access memory at address 0x2>; */
+                       92:                 return ((buf[0] << 8) | buf[1]);
+                       93:         case EXIF_BYTE_ORDER_INTEL:
+                       94:                 return ((buf[1] << 8) | buf[0]);
+                       ||:
+                       --: }
+                       at exif-utils.c:94
+
+#1  0x00000000004eaaa7 in exif_get_short (/home/ebiazo/Documents/fuzzing-101_solution/exercise-2/build/triager)
+                       102: ExifShort exif_get_short(buf = (const unsigned char *)0x2 <error: Cannot access memory at address 0x2>, order = (ExifByteOrder)EXIF_BYTE_ORDER_INTEL) {
+                       |||: /* Local reference: const unsigned char * buf = 0x2 <error: Cannot access memory at address 0x2>; */
+                       |||: /* Local reference: ExifByteOrder order = EXIF_BYTE_ORDER_INTEL; */
+                       103: {
+                       104: 	return (exif_get_sshort (buf, order) & 0xffff);
+                       |||:
+                       ---: }
+                       at exif-utils.c:104
+
+#2  0x00000000004ef182 in mnote_canon_entry_get_value (/home/ebiazo/Documents/fuzzing-101_solution/exercise-2/build/triager)
+                       448: char mnote_canon_entry_get_value(entry = (const MnoteCanonEntry *)<optimized out>, t = (unsigned int)<optimized out>, val = (char *)<optimized out>, maxlen = (unsigned int)1023) {
+                       |||:
+                       |||: /* Local reference: const MnoteCanonEntry * entry = <optimized out>; */
+                       |||: /* Local reference: char * val = <optimized out>; */
+                       |||: /* Local reference: unsigned int maxlen = 1023; */
+                       |||: /* Local reference: ExifShort vs = <optimized out>; */
+                       |||: /* Local reference: unsigned char * data = 0x0; */
+                       |||: /* Local reference: unsigned int t = <optimized out>; */
+                       506: 	case MNOTE_CANON_TAG_FOCAL_LENGTH:
+                       507: 		CF (entry->format, EXIF_FORMAT_SHORT, val, maxlen);
+                       508: 		vs = exif_get_short (entry->data + t * 2, entry->order);
+                       |||:
+                       ---: }
+                       at mnote-canon-entry.c:508
+
+#3  0x00000000004cd2ce in test_exif_data (/home/ebiazo/Documents/fuzzing-101_solution/exercise-2/build/triager)
+                       ??: int test_exif_data(d = (ExifData *)0x606000000200) {
+                       ||:
+                       ||: /* Local reference: ExifMnoteData * md = 0x60d0000001e0; */
+                       ||: /* Local reference: unsigned int i = 46; */
+                       ||: /* Local reference: char [1024] v = '\000' <repeats 1023 times>; */
+                       55: 		exif_mnote_data_get_title (md, i);
+                       56: 		exif_mnote_data_get_description (md, i);
+                       57: 		exif_mnote_data_get_value (md, i, v, sizeof (v));
+                       ||:
+                       --: }
+                       at ../harness.c:57
+
+#4  0x00000000004cd2ce in LLVMFuzzerTestOneInput (/home/ebiazo/Documents/fuzzing-101_solution/exercise-2/build/triager)
+                       64: int LLVMFuzzerTestOneInput(data = (const uint8_t *)<optimized out>, size = (size_t)<optimized out>) {
+                       ||:
+                       ||: /* Local reference: ExifData * d = 0x606000000200; */
+                       75:     /* try the exif loader */
+                       76:     exif_data_foreach_content(d, data_foreach_func, NULL);
+                       77:     test_exif_data (d);
+                       ||:
+                       --: }
+                       at ../harness.c:77
+
+#5  0x00000000004cd5d5 in main (/home/ebiazo/Documents/fuzzing-101_solution/exercise-2/build/triager)
+                        95: int main(argc = (int)<optimized out>, argv = (char **)<optimized out>) {
+                       |||:
+                       |||: /* Local reference: char * buffer = 0x61d000000080 "\377\330\377\341\a\342Exif"; */
+                       |||: /* Local reference: struct stat st = {st_dev = 2049, st_ino = 504858, st_nlink = 1, st_mode = 33204, st_uid = 1000, st_gid = 1000, __pad0 = 0, st_rdev = 0, st_size = 2275, st_blksize = 4096, st_blocks = 8, st_atim = {tv_... */
+                       |||: /* Local reference: FILE * fd = 0x615000000080; */
+                       106:     fread(buffer, sizeof(char), st.st_size, fd);
+                       107: 
+                       108:     LLVMFuzzerTestOneInput(buffer, st.st_size);
+                       |||:
+                       ---: }
+                       at ../harness.c:108
+
+Crash context:
+/* Register reference: rbx - 0x0000000000000002 (2) */
+Execution stopped here ==> 0x00000000004eaaa7: movzx  eax,BYTE PTR [rbx+0x1]
+
+Register info:
+   rax - 0x0000000000000000 (0)
+   rbx - 0x0000000000000002 (2)
+   rcx - 0x0000000000f793a8 (16225192)
+   rdx - 0x00007fffffffd580 (140737488344448)
+   rsi - 0x0000000000000001 (1)
+   rdi - 0x0000000000000003 (3)
+   rbp - 0x0000000000000001 (0x1)
+   rsp - 0x00007fffffffd020 (0x7fffffffd020)
+    r8 - 0x000000000000000f (15)
+    r9 - 0xffffefff800085c8 (-17594333493816)
+   r10 - 0x000010007fff7abc (17594333493948)
+   r11 - 0x000000000000000c (12)
+   r12 - 0x0000000000000001 (1)
+   r13 - 0x0000000000000000 (0)
+   r14 - 0x00000c0c00000076 (13245679140982)
+   r15 - 0x00006060000003bc (105965433127868)
+   rip - 0x00000000004eaaa7 (0x4eaaa7 <exif_get_short+71>)
+eflags - 0x00010246 ([ PF ZF IF RF ])
+    cs - 0x00000033 (51)
+    ss - 0x0000002b (43)
+    ds - 0x00000000 (0)
+    es - 0x00000000 (0)
+    fs - 0x00000000 (0)
+    gs - 0x00000000 (0)

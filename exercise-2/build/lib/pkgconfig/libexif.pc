@@ -1,0 +1,11 @@
+prefix=/home/ebiazo/Documents/fuzzing-101_solution/exercise-2/libexif/../build
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: libexif
+Description: Library for easy access to EXIF data
+Requires:
+Version: 0.6.14
+Libs: -L${libdir} -lexif -lm
+Cflags: -I${includedir}

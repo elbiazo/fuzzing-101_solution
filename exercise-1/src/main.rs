@@ -8,7 +8,7 @@ use libafl::corpus::{
 };
 use libafl::events::SimpleEventManager;
 use libafl::executors::{ForkserverExecutor, TimeoutForkserverExecutor};
-use libafl::feedbacks::{MapFeedbackState, MaxMapFeedback, TimeFeedback, TimeoutFeedback};
+use libafl::feedbacks::{MapFeedbackState, MaxMapFeedback, TimeFeedback};
 use libafl::inputs::BytesInput;
 use libafl::mutators::{havoc_mutations, StdScheduledMutator};
 use libafl::observers::{ConstMapObserver, HitcountsMapObserver, TimeObserver};
@@ -18,6 +18,7 @@ use libafl::stats::SimpleStats;
 use libafl::{feedback_and_fast, feedback_or, Fuzzer, StdFuzzer};
 use std::path::PathBuf;
 use std::time::Duration;
+use libafl::feedbacks::CrashFeedback;
 
 /// Size of coverage map shared between observer and executor
 const MAP_SIZE: usize = 65536;
@@ -107,7 +108,8 @@ fn main() {
     // The goal is to do similar deduplication to what AFL does
     let objective = feedback_and_fast!(
         // A TimeoutFeedback reports as "interesting" if the exits via a Timeout
-        TimeoutFeedback::new(),
+        // TimeoutFeedback::new(),
+        CrashFeedback::new(),
         // Combined with the requirement for new coverage over timeouts
         MaxMapFeedback::new(&objective_state, &edges_observer)
     );
@@ -172,9 +174,10 @@ fn main() {
     // that implements an AFL-like mechanism that will spawn child processes to fuzz
     let fork_server = ForkserverExecutor::new(
         "./xpdf/install/bin/pdftotext".to_string(),
-        &[String::from("@@")],
+        // &[String::from("@@")],
+        &[],
         // we're passing testcases via on-disk file; set to use_shmem_testcase to false
-        false,
+        true,
         tuple_list!(edges_observer, time_observer),
     ).unwrap();
 

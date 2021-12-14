@@ -1,0 +1,190 @@
+Summary: ASAN detected heap-buffer-overflow in exif_entry_get_value after a READ leading to SIGABRT (si_signo=6) / SI_TKILL (si_code=-6)
+Command line: ./build/triager @@
+Testcase: solutions/f4d4fa3deb7a810f
+Crash bucket: 4cea0bdffdfe4d9c0093798d70c9368e
+
+Crashing thread backtrace:
+#0  0x00007ffff7c6618b in __GI_raise (/lib/x86_64-linux-gnu/libc.so.6)
+                       at ../sysdeps/unix/sysv/linux/raise.c:50
+
+#1  0x00007ffff7c45859 in __GI_abort (/lib/x86_64-linux-gnu/libc.so.6)
+                       at abort.c:79
+
+#2  0x00000000004bb347 in __sanitizer::Abort() (/home/ebiazo/Documents/fuzzing-101_solution/exercise-2/build/triager)
+                       at src/libfuzzer.c:23
+
+#3  0x00000000004b9d71 in __sanitizer::Die() (/home/ebiazo/Documents/fuzzing-101_solution/exercise-2/build/triager)
+                       at src/libfuzzer.c:23
+
+#4  0x00000000004a16a9 in __asan::ScopedInErrorReport::~ScopedInErrorReport() (/home/ebiazo/Documents/fuzzing-101_solution/exercise-2/build/triager)
+                       at src/libfuzzer.c:23
+
+#5  0x00000000004a315e in __asan::ReportGenericError(unsigned long, unsigned long, unsigned long, unsigned long, bool, unsigned long, unsigned int, bool) (/home/ebiazo/Documents/fuzzing-101_solution/exercise-2/build/triager)
+                       at src/libfuzzer.c:23
+
+#6  0x000000000043aecf in strspn (/home/ebiazo/Documents/fuzzing-101_solution/exercise-2/build/triager)
+                       at src/libfuzzer.c:23
+
+#7  0x00000000004dd0db in exif_entry_get_value (/home/ebiazo/Documents/fuzzing-101_solution/exercise-2/build/triager)
+                       542: const exif_entry_get_value(e = (ExifEntry *)<optimized out>, val = (char *)<optimized out>, maxlen = (unsigned int)1999) {
+                       |||:
+                       |||: /* Local reference: const unsigned char * t = 0x602000000dd3 "  "; */
+                       |||: /* Local reference: ExifEntry * e = <optimized out>; */
+                       |||: /* Local reference: unsigned int ts = 2; */
+                       694: 		    t = e->data + strlen ((char *) e->data) + 1;
+                       695: 		    ts = e->data + e->size - t;
+                       696: 		    if ((ts > 0) && (strspn ((char *)t, " ") != ts))
+                       |||:
+                       ---: }
+                       at exif-entry.c:696
+
+#8  0x00000000004ccfbb in content_foreach_func (/home/ebiazo/Documents/fuzzing-101_solution/exercise-2/build/triager)
+                       16: void content_foreach_func(entry = (ExifEntry *)<optimized out>, UNUSED_PARAM_callback_data = (void *)<optimized out>) {
+                       ||:
+                       ||: /* Local reference: ExifEntry * entry = <optimized out>; */
+                       ||: /* Local reference: char [2001] buf = "25 (Photographer) - ", '\000' <repeats 1980 times>; */
+                       23: 	exif_tag_get_name(entry->tag);
+                       24: 	exif_format_get_name(entry->format);
+                       25: 	exif_entry_get_value(entry, buf, sizeof(buf)-1);
+                       ||:
+                       --: }
+                       at ../harness.c:25
+
+#9  0x00000000004cea6a in exif_content_foreach_entry (/home/ebiazo/Documents/fuzzing-101_solution/exercise-2/build/triager)
+                       191: void exif_content_foreach_entry(content = (ExifContent *)0x6030000004f0, func = (ExifContentForeachEntryFunc)0x4cce40 <content_foreach_func>, data = (void *)0x0) {
+                       |||:
+                       |||: /* Local reference: unsigned int i = 0; */
+                       |||: /* Local reference: ExifContent * content = 0x6030000004f0; */
+                       |||: /* Local reference: ExifContentForeachEntryFunc func = 0x4cce40 <content_foreach_func>; */
+                       |||: /* Local reference: void * data = 0x0; */
+                       198: 
+                       199: 	for (i = 0; i < content->count; i++)
+                       200: 		func (content->entries[i], data);
+                       |||:
+                       ---: }
+                       at exif-content.c:200
+
+#10 0x00000000004d7107 in exif_data_foreach_content (/home/ebiazo/Documents/fuzzing-101_solution/exercise-2/build/triager)
+                       1022: void exif_data_foreach_content(data = (ExifData *)0x606000000200, func = (ExifDataForeachContentFunc)0x4cd0d0 <data_foreach_func>, user_data = (void *)0x0) {
+                       ||||:
+                       ||||: /* Local reference: unsigned int i = 0; */
+                       ||||: /* Local reference: ExifDataForeachContentFunc func = 0x4cd0d0 <data_foreach_func>; */
+                       ||||: /* Local reference: ExifData * data = 0x606000000200; */
+                       ||||: /* Local reference: void * user_data = 0x0; */
+                       1029: 
+                       1030: 	for (i = 0; i < EXIF_IFD_COUNT; i++)
+                       1031: 		func (data->ifd[i], user_data);
+                       ||||:
+                       ----: }
+                       at exif-data.c:1031
+
+#11 0x00000000004cd221 in LLVMFuzzerTestOneInput (/home/ebiazo/Documents/fuzzing-101_solution/exercise-2/build/triager)
+                       64: int LLVMFuzzerTestOneInput(data = (const uint8_t *)<optimized out>, size = (size_t)<optimized out>) {
+                       ||:
+                       ||: /* Local reference: ExifData * d = 0x606000000200; */
+                       74: 
+                       75:     /* try the exif loader */
+                       76:     exif_data_foreach_content(d, data_foreach_func, NULL);
+                       ||:
+                       --: }
+                       at ../harness.c:76
+
+#12 0x00000000004cd5d5 in main (/home/ebiazo/Documents/fuzzing-101_solution/exercise-2/build/triager)
+                        95: int main(argc = (int)<optimized out>, argv = (char **)<optimized out>) {
+                       |||:
+                       |||: /* Local reference: char * buffer = 0x621000000100 "\377\330\377\341\017\202Exif"; */
+                       |||: /* Local reference: struct stat st = {st_dev = 2049, st_ino = 504956, st_nlink = 1, st_mode = 33204, st_uid = 1000, st_gid = 1000, __pad0 = 0, st_rdev = 0, st_size = 4032, st_blksize = 4096, st_blocks = 8, st_atim = {tv_... */
+                       |||: /* Local reference: FILE * fd = 0x615000000080; */
+                       106:     fread(buffer, sizeof(char), st.st_size, fd);
+                       107: 
+                       108:     LLVMFuzzerTestOneInput(buffer, st.st_size);
+                       |||:
+                       ---: }
+                       at ../harness.c:108
+
+ASAN Report:
+=================================================================
+==3325274==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x602000000dd5 at pc 0x00000043aeb0 bp 0x7fffffffc690 sp 0x7fffffffbe50
+READ of size 3 at 0x602000000dd5 thread T0
+    #0 0x43aeaf in strspn ??:?
+    #1 0x4dd0da in exif_entry_get_value /home/ebiazo/Documents/fuzzing-101_solution/exercise-2/libexif/libexif/exif-entry.c:696
+    #2 0x4ccfba in content_foreach_func /home/ebiazo/Documents/fuzzing-101_solution/exercise-2/build/../harness.c:25
+    #3 0x4cea69 in exif_content_foreach_entry /home/ebiazo/Documents/fuzzing-101_solution/exercise-2/libexif/libexif/exif-content.c:200
+    #4 0x4d7106 in exif_data_foreach_content /home/ebiazo/Documents/fuzzing-101_solution/exercise-2/libexif/libexif/exif-data.c:1031
+    #5 0x4cd220 in LLVMFuzzerTestOneInput /home/ebiazo/Documents/fuzzing-101_solution/exercise-2/build/../harness.c:76
+    #6 0x4cd5d4 in main /home/ebiazo/Documents/fuzzing-101_solution/exercise-2/build/../harness.c:108
+    #7 0x7ffff7c470b2 in __libc_start_main /build/glibc-eX1tMB/glibc-2.31/csu/../csu/libc-start.c:308
+    #8 0x424fcd in _start ??:?
+
+0x602000000dd5 is located 0 bytes to the right of 5-byte region [0x602000000dd0,0x602000000dd5)
+allocated by thread T0 here:
+    #0 0x49d882 in calloc ??:?
+    #1 0x4d2501 in exif_data_alloc /home/ebiazo/Documents/fuzzing-101_solution/exercise-2/libexif/libexif/exif-data.c:79
+    #2 0x4d2501 in exif_data_load_data_entry /home/ebiazo/Documents/fuzzing-101_solution/exercise-2/libexif/libexif/exif-data.c:188
+    #3 0x4d2501 in exif_data_load_data_content /home/ebiazo/Documents/fuzzing-101_solution/exercise-2/libexif/libexif/exif-data.c:416
+
+SUMMARY: AddressSanitizer: heap-buffer-overflow ??:? in strspn
+Shadow bytes around the buggy address:
+  0x0c047fff8160: fa fa 06 fa fa fa 00 04 fa fa 01 fa fa fa 00 00
+  0x0c047fff8170: fa fa 00 01 fa fa fd fa fa fa 00 00 fa fa 00 06
+  0x0c047fff8180: fa fa fd fd fa fa 00 00 fa fa 02 fa fa fa 00 00
+  0x0c047fff8190: fa fa 00 fa fa fa 00 00 fa fa 00 fa fa fa 00 00
+  0x0c047fff81a0: fa fa 02 fa fa fa 00 00 fa fa 00 00 fa fa 00 00
+=>0x0c047fff81b0: fa fa 02 fa fa fa 00 00 fa fa[05]fa fa fa 00 00
+  0x0c047fff81c0: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+  0x0c047fff81d0: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+  0x0c047fff81e0: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+  0x0c047fff81f0: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+  0x0c047fff8200: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           00
+  Partially addressable: 01 02 03 04 05 06 07 
+  Heap left redzone:       fa
+  Freed heap region:       fd
+  Stack left redzone:      f1
+  Stack mid redzone:       f2
+  Stack right redzone:     f3
+  Stack after return:      f5
+  Stack use after scope:   f8
+  Global redzone:          f9
+  Global init order:       f6
+  Poisoned by user:        f7
+  Container overflow:      fc
+  Array cookie:            ac
+  Intra object redzone:    bb
+  ASan internal:           fe
+  Left alloca redzone:     ca
+  Right alloca redzone:    cb
+  Shadow gap:              cc
+==3325274==ABORTING
+
+Crash context:
+/* Register reference: rax - 0x0000000000000000 (0) */
+/* Register reference: rsp - 0x00007fffffffaea0 (0x7fffffffaea0) */
+Execution stopped here ==> 0x00007ffff7c6618b: mov    rax,QWORD PTR [rsp+0x108]
+
+Register info:
+   rax - 0x0000000000000000 (0)
+   rbx - 0x00007ffff7c1b8c0 (140737350056128)
+   rcx - 0x00007ffff7c6618b (140737350361483)
+   rdx - 0x0000000000000000 (0)
+   rsi - 0x00007fffffffaea0 (140737488334496)
+   rdi - 0x0000000000000002 (2)
+   rbp - 0x00007fffffffbe30 (0x7fffffffbe30)
+   rsp - 0x00007fffffffaea0 (0x7fffffffaea0)
+    r8 - 0x0000000000000000 (0)
+    r9 - 0x00007fffffffaea0 (140737488334496)
+   r10 - 0x0000000000000008 (8)
+   r11 - 0x0000000000000246 (582)
+   r12 - 0x00007fffffffbe50 (140737488338512)
+   r13 - 0x00007fffffffc690 (140737488340624)
+   r14 - 0x00007fffffffbe00 (140737488338432)
+   r15 - 0x0000000000778508 (7832840)
+   rip - 0x00007ffff7c6618b (0x7ffff7c6618b <__GI_raise+203>)
+eflags - 0x00000246 ([ PF ZF IF ])
+    cs - 0x00000033 (51)
+    ss - 0x0000002b (43)
+    ds - 0x00000000 (0)
+    es - 0x00000000 (0)
+    fs - 0x00000000 (0)
+    gs - 0x00000000 (0)
