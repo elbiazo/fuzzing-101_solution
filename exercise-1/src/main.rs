@@ -173,7 +173,7 @@ fn main() {
     // ForkserverExecutor and sets a timeout before each run. This gives us an executor
     // that implements an AFL-like mechanism that will spawn child processes to fuzz
     let fork_server = ForkserverExecutor::new(
-        "./xpdf/install/bin/pdftotext".to_string(),
+        "/home/elbiazo/Documents/libafl_practice/fuzzing101_ex1/xpdf/bin/pdftotext".to_string(),
         // &[String::from("@@")],
         &[],
         // we're passing testcases via on-disk file; set to use_shmem_testcase to false

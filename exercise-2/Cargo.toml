@@ -7,9 +7,9 @@ edition = "2021"
 
 [dependencies]
 
-libafl = { version = "0.7.0", path = "../../../tools/LibAFL/libafl" }
-libafl_sugar = { version = "0.7.0",path = "../../../tools/LibAFL/libafl_sugar" }
-libafl_targets = { version = "0.7.0",path = "../../../tools/LibAFL/libafl_targets", features = ["libfuzzer", "sancov_pcguard_hitcounts"] }
+libafl = "0.7.0"
+libafl_sugar = "0.7.0" 
+libafl_targets = "0.7.0"
 [lib]
 name = "exercisetwo"
 crate-type = ["staticlib"]
